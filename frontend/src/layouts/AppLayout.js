@@ -21,6 +21,8 @@ import {
   Badge,
   Paper
 } from '@mui/material';
+// ... imports
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'; // Import a new icon
 import { 
   AccountCircle,
   Dashboard as DashboardIcon,
@@ -30,6 +32,7 @@ import {
   Settings as SettingsIcon,
   ExitToApp as LogoutIcon
 } from '@mui/icons-material';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const drawerWidth = 240;
 
@@ -56,7 +59,14 @@ const AppLayout = () => {
   const navItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/', color: '#3f51b5' },
     { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory', color: '#9c27b0' },
+    // Add the new line below
+    { text: 'My Requests', icon: <ShoppingCartIcon />, path: '/my-requests', color: '#f44336' },
   ];
+
+  // Conditionally add the manager link
+  if (user && (user.role === 'Admin' || user.role === 'Manager')) {
+    navItems.push({ text: 'Manage Requests', icon: <AssignmentIcon />, path: '/manage-requests' });
+  }
 
   const isCurrentPath = (path) => {
     if (path === '/') {

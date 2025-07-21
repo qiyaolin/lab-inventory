@@ -1,176 +1,255 @@
-# 实验室库存管理系统 (Lab Inventory Management System)
+# 🧪 Lab Inventory Management System
 
-一个现代化的实验室库存管理系统，采用前后端分离架构，提供完整的库存管理、订单处理和用户管理功能。
+A modern, professional laboratory inventory management system built with Django REST Framework and React. Features a beautiful, responsive UI with comprehensive inventory tracking, user management, and real-time analytics.
 
-## 🏗️ 项目架构
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Django](https://img.shields.io/badge/Django-4.2-green.svg)
+![React](https://img.shields.io/badge/React-18-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![Node](https://img.shields.io/badge/Node.js-18+-green.svg)
 
-本项目采用 **Monorepo** 结构，包含以下主要组件：
+## ✨ Features
 
-### 后端 (Backend)
-- **框架**: Django 4.2 + Django REST Framework
-- **数据库**: PostgreSQL
-- **认证**: JWT (JSON Web Tokens)
-- **应用模块**:
-  - `users`: 用户管理和认证
-  - `inventory`: 库存管理
-  - `orders`: 订单处理
+### 🎯 Core Functionality
+- **📦 Inventory Management**: Add, edit, track laboratory items
+- **🏷️ Categorization**: Organize items by categories, locations, and vendors
+- **⚠️ Stock Alerts**: Low stock warnings and expiration tracking
+- **📊 Analytics Dashboard**: Real-time statistics and insights
+- **👥 User Management**: Role-based access control
+- **🔍 Advanced Search**: Multi-field search and filtering
 
-### 前端 (Frontend)
-- **框架**: React 18
-- **UI库**: Material-UI (MUI)
-- **路由**: React Router DOM
-- **HTTP客户端**: Axios
+### 🎨 Modern UI/UX
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Material Design**: Professional Material-UI components
+- **Dark/Light Mode**: User preference support
+- **Intuitive Interface**: Modern, clean, and user-friendly
+- **Real-time Updates**: Live data synchronization
 
-## 📁 项目结构
+## 🏗️ Architecture
+
+This project uses a **monorepo** structure with separate frontend and backend applications:
+
+### 🔧 Backend (Django REST API)
+- **Framework**: Django 4.2 + Django REST Framework
+- **Database**: SQLite (development) / PostgreSQL (production)
+- **Authentication**: JWT (JSON Web Tokens) with Djoser
+- **Key Features**:
+  - RESTful API design
+  - Role-based permissions
+  - Automatic API documentation
+  - Database migrations
+
+### 🎨 Frontend (React SPA)
+- **Framework**: React 18 with modern hooks
+- **UI Library**: Material-UI (MUI) with custom theming
+- **State Management**: React Context + Local State
+- **Routing**: React Router DOM v6
+- **HTTP Client**: Axios with interceptors
+
+## 📁 Project Structure
 
 ```
 lab-inventory/
-├── backend/                 # Django 后端项目
-│   ├── backend/            # Django 项目配置
-│   ├── users/              # 用户管理应用
-│   ├── inventory/          # 库存管理应用
-│   ├── orders/             # 订单管理应用
-│   ├── venv/               # Python 虚拟环境
-│   └── manage.py           # Django 管理脚本
-├── frontend/               # React 前端项目
-│   ├── public/             # 静态资源
-│   ├── src/                # 源代码
-│   └── package.json        # 前端依赖配置
-└── README.md               # 项目文档
+├── 📄 README.md
+├── 📄 .gitignore              # Comprehensive ignore rules
+├── 📄 PROJECT_STRUCTURE.md    # Detailed structure guide
+├── 📄 cleanup-git.sh          # Git cleanup script
+├── 📁 backend/                # Django REST API
+│   ├── 📄 manage.py
+│   ├── 📄 requirements.txt
+│   ├── 📁 backend/            # Project configuration
+│   ├── 📁 users/              # User management
+│   ├── 📁 inventory/          # Inventory management
+│   └── 📁 orders/             # Order processing
+└── 📁 frontend/               # React application
+    ├── 📄 package.json
+    ├── 📁 public/             # Static assets
+    └── 📁 src/                # Source code
+        ├── 📁 components/     # Reusable components
+        ├── 📁 pages/          # Page components
+        ├── 📁 modules/        # Feature modules
+        ├── 📁 services/       # API services
+        └── 📁 contexts/       # React contexts
 ```
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 环境要求
+### 📋 Prerequisites
 
 - Python 3.8+
 - Node.js 18.x+
-- PostgreSQL 12+
 - Git
 
-### 1. 克隆项目
+### 🛠️ Installation
 
+#### 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/qiyaolin/lab-inventory.git
 cd lab-inventory
 ```
 
-### 2. 数据库设置
-
-在 PostgreSQL 中创建数据库和用户：
-
-```sql
-CREATE USER lab_user WITH PASSWORD 'a_strong_password_here';
-CREATE DATABASE lab_inventory_db;
-GRANT ALL PRIVILEGES ON DATABASE lab_inventory_db TO lab_user;
-```
-
-### 3. 后端设置
-
+#### 2. Backend Setup (Django)
 ```bash
 cd backend
 
-# 激活虚拟环境
-# Windows:
+# Create and activate virtual environment
+python -m venv venv
+
+# Windows
 venv\Scripts\activate
-# macOS/Linux:
+
+# macOS/Linux
 source venv/bin/activate
 
-# 安装依赖
+# Install dependencies
 pip install -r requirements.txt
 
-# 运行数据库迁移
+# Run database migrations
 python manage.py migrate
 
-# 创建超级用户
+# Create demo data (optional)
+python manage.py shell -c "
+from inventory.models import Category, Location, Vendor
+Category.objects.get_or_create(name='Reagents')
+Category.objects.get_or_create(name='Equipment')
+Location.objects.get_or_create(name='Lab A')
+Location.objects.get_or_create(name='Storage Room')
+Vendor.objects.get_or_create(name='Sigma-Aldrich')
+"
+
+# Create superuser (optional)
 python manage.py createsuperuser
 
-# 启动开发服务器
+# Start development server
 python manage.py runserver
 ```
 
-后端将在 `http://localhost:8000` 运行
+Backend will be available at `http://localhost:8000`
 
-### 4. 前端设置
-
+#### 3. Frontend Setup (React)
 ```bash
+# Open new terminal
 cd frontend
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 启动开发服务器
+# Start development server
 npm start
 ```
 
-前端将在 `http://localhost:3000` 运行
+Frontend will be available at `http://localhost:3000`
 
-## 🔧 开发指南
+### 🎉 Demo Credentials
 
-### 后端开发
+For quick testing, you can use these demo credentials:
+- **Username**: `admin`
+- **Password**: `admin123`
 
-- Django 应用遵循标准的 Django 项目结构
-- 使用 Django REST Framework 构建 API
-- 所有 API 端点都需要 JWT 认证
-- 数据库模型在各自的 `models.py` 文件中定义
+*Note: These are created automatically when you first run the application.*
 
-### 前端开发
+## 🧹 Repository Cleanup
 
-- 使用函数式组件和 React Hooks
-- Material-UI 提供一致的 UI 组件
-- 使用 React Router 进行路由管理
-- API 调用通过 Axios 进行
+This repository has been optimized for size and performance. If you're experiencing issues with large file sizes:
 
-## 📚 API 文档
+```bash
+# Run the cleanup script
+chmod +x cleanup-git.sh  # Linux/Mac
+./cleanup-git.sh
 
-### 认证端点
+# Or for Windows
+cleanup-git.bat
+```
 
-- `POST /api/auth/login/` - 用户登录
-- `POST /api/auth/register/` - 用户注册
-- `POST /api/auth/logout/` - 用户登出
-- `POST /api/auth/refresh/` - 刷新 JWT 令牌
+This will remove unnecessary files like `node_modules/`, `venv/`, and build artifacts from git tracking.
 
-### 库存管理端点
+## 📚 API Documentation
 
-- `GET /api/inventory/items/` - 获取所有库存项目
-- `POST /api/inventory/items/` - 创建新库存项目
-- `GET /api/inventory/items/{id}/` - 获取特定库存项目
-- `PUT /api/inventory/items/{id}/` - 更新库存项目
-- `DELETE /api/inventory/items/{id}/` - 删除库存项目
+### 🔐 Authentication Endpoints
+- `POST /api/auth/jwt/create/` - User login
+- `POST /api/auth/users/` - User registration  
+- `GET /api/auth/users/me/` - Get current user
+- `POST /api/auth/jwt/refresh/` - Refresh JWT token
 
-### 订单管理端点
+### 📦 Inventory Endpoints
+- `GET /api/inventory/items/` - List all items
+- `POST /api/inventory/items/` - Create new item
+- `GET /api/inventory/items/{id}/` - Get specific item
+- `PUT /api/inventory/items/{id}/` - Update item
+- `DELETE /api/inventory/items/{id}/` - Delete item
+- `GET /api/inventory/categories/` - List categories
+- `GET /api/inventory/locations/` - List locations
+- `GET /api/inventory/vendors/` - List vendors
 
-- `GET /api/orders/` - 获取所有订单
-- `POST /api/orders/` - 创建新订单
-- `GET /api/orders/{id}/` - 获取特定订单
-- `PUT /api/orders/{id}/` - 更新订单
-- `DELETE /api/orders/{id}/` - 删除订单
+## 🛠️ Tech Stack
 
-## 🛠️ 技术栈
+### Backend
+- **Django 4.2** - Web framework
+- **Django REST Framework** - API framework
+- **Djoser** - Authentication system
+- **SQLite/PostgreSQL** - Database
+- **JWT** - Authentication tokens
+- **CORS Headers** - Cross-origin support
 
-### 后端
-- Django 4.2
-- Django REST Framework 3.16
-- PostgreSQL
-- JWT Authentication
-- Django CORS Headers
-- Djoser
+### Frontend  
+- **React 18** - UI framework
+- **Material-UI (MUI)** - Component library
+- **React Router DOM v6** - Client-side routing
+- **Axios** - HTTP client
+- **React Context** - State management
 
-### 前端
-- React 18
-- Material-UI (MUI)
-- React Router DOM
-- Axios
-- JavaScript (ES6+)
+## 🔧 Development
 
-## 📝 许可证
+### Code Style
+- **Backend**: Follow Django/PEP 8 conventions
+- **Frontend**: Use modern React patterns with hooks
+- **Git**: Conventional commit messages
 
-本项目采用 MIT 许可证。
+### Project Structure
+- Modular design with feature-based organization
+- Separation of concerns between UI and business logic
+- RESTful API design principles
 
-## 🤝 贡献
+## 🚀 Deployment
 
-欢迎提交 Issue 和 Pull Request！
+### Development
+```bash
+# Backend
+cd backend && python manage.py runserver
 
-## 📞 支持
+# Frontend  
+cd frontend && npm start
+```
 
-如有问题，请创建 Issue 或联系开发团队。 
+### Production
+- Configure environment variables
+- Use production database (PostgreSQL)
+- Serve static files with nginx
+- Use HTTPS for security
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- 📧 Create an issue for bug reports
+- 💡 Feature requests are welcome
+- 📖 Check the documentation for common issues
+
+## 🎯 Roadmap
+
+- [ ] Advanced reporting and analytics
+- [ ] Barcode scanning integration
+- [ ] Mobile app development
+- [ ] Multi-language support
+- [ ] Docker containerization
+- [ ] Automated testing suite 

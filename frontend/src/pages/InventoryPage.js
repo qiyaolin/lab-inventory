@@ -12,7 +12,13 @@ import {
   TextField,
   InputAdornment,
   Fade,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Snackbar
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -26,11 +32,17 @@ import {
 import inventoryService from '../services/inventoryService';
 import InventoryTable from '../modules/inventory/InventoryTable';
 import AddItemModal from '../modules/inventory/AddItemModal';
+import EditItemModal from '../modules/inventory/EditItemModal';
+import RequestItemModal from '../modules/orders/RequestItemModal';
 
 const InventoryPage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
   const [stats, setStats] = useState({
@@ -39,6 +51,8 @@ const InventoryPage = () => {
     categories: 0,
     locations: 0
   });
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [requestFeedback, setRequestFeedback] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,6 +106,75 @@ const InventoryPage = () => {
         parseFloat(item.quantity) <= parseFloat(item.stock_warning_threshold || 0)
       ).length
     }));
+  };
+
+  const handleEditItem = (item) => {
+    setSelectedItem(item);
+    setIsEditModalOpen(true);
+  };
+
+  const handleItemUpdated = (updatedItem) => {
+    const updatedItems = items.map(item => 
+      item.id === updatedItem.id ? updatedItem : item
+    );
+    setItems(updatedItems);
+    
+    // Update stats
+    setStats(prev => ({
+      ...prev,
+      lowStock: updatedItems.filter(item => 
+        parseFloat(item.quantity) <= parseFloat(item.stock_warning_threshold || 0)
+      ).length
+    }));
+  };
+
+  const handleDeleteItem = (item) => {
+    setItemToDelete(item);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteItem = async () => {
+    if (!itemToDelete) return;
+    
+    try {
+      await inventoryService.deleteItem(itemToDelete.id);
+      
+      const updatedItems = items.filter(item => item.id !== itemToDelete.id);
+      setItems(updatedItems);
+      
+      // Update stats
+      setStats(prev => ({
+        ...prev,
+        totalItems: prev.totalItems - 1,
+        lowStock: updatedItems.filter(item => 
+          parseFloat(item.quantity) <= parseFloat(item.stock_warning_threshold || 0)
+        ).length
+      }));
+      
+      setDeleteConfirmOpen(false);
+      setItemToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+      setError('Failed to delete item. Please try again.');
+    }
+  };
+
+  const handleRequest = (item) => {
+    console.log('Request button clicked for item:', item);
+    setSelectedItem(item);
+    setIsRequestModalOpen(true);
+    console.log('isRequestModalOpen set to:', true);
+  };
+
+  const handleRequestModalClose = (success) => {
+    setIsRequestModalOpen(false);
+    if (success) {
+      setRequestFeedback({ open: true, message: 'Request submitted successfully!', severity: 'success' });
+    }
+  };
+  
+  const handleFeedbackClose = () => {
+    setRequestFeedback({ ...requestFeedback, open: false });
   };
 
   // Filter items based on search term
@@ -282,7 +365,13 @@ const InventoryPage = () => {
             overflow: 'hidden'
           }}
         >
-          <InventoryTable items={filteredItems} loading={loading} />
+          <InventoryTable 
+            items={filteredItems} 
+            loading={loading} 
+            onEditItem={handleEditItem}
+            onDeleteItem={handleDeleteItem}
+            onRequest={handleRequest} // Pass the handler function
+          />
         </Paper>
 
         {/* Add Item Modal */}
@@ -291,6 +380,69 @@ const InventoryPage = () => {
           onClose={() => setIsModalOpen(false)} 
           onItemAdded={handleItemAdded}
         />
+
+        {/* Edit Item Modal */}
+        <EditItemModal 
+          open={isEditModalOpen} 
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedItem(null);
+          }} 
+          onItemUpdated={handleItemUpdated}
+          item={selectedItem}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteConfirmOpen}
+          onClose={() => setDeleteConfirmOpen(false)}
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+            }
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 'bold' }}>
+            Confirm Deletion
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to delete "{itemToDelete?.name}"? This action cannot be undone.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 0 }}>
+            <Button 
+              onClick={() => setDeleteConfirmOpen(false)}
+              variant="outlined"
+              sx={{ borderRadius: 2 }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={confirmDeleteItem} 
+              variant="contained"
+              color="error"
+              sx={{ borderRadius: 2 }}
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Add the RequestItemModal */}
+        <RequestItemModal
+          open={isRequestModalOpen}
+          onClose={handleRequestModalClose}
+          item={selectedItem}
+        />
+        
+        {/* Add the Snackbar for feedback */}
+        <Snackbar open={requestFeedback.open} autoHideDuration={6000} onClose={handleFeedbackClose}>
+          <Alert onClose={handleFeedbackClose} severity={requestFeedback.severity} sx={{ width: '100%' }}>
+            {requestFeedback.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </Fade>
   );

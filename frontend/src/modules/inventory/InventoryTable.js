@@ -1,6 +1,7 @@
 import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Box } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon, AddShoppingCart as AddShoppingCartIcon } from '@mui/icons-material';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 70 },
@@ -59,12 +60,66 @@ const columns = [
   },
 ];
 
-const InventoryTable = ({ items, loading }) => {
+const InventoryTable = ({ items, loading, onEditItem, onDeleteItem, onRequest }) => {
+  const columnsWithActions = [
+    ...columns,
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150, // Increase width to fit the new button
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {/* Add this new IconButton for requesting */}
+          <Tooltip title="Request Item">
+            <IconButton color="primary" onClick={() => onRequest(params.row)}>
+              <AddShoppingCartIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit Item">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditItem(params.row);
+              }}
+              sx={{
+                color: 'primary.main',
+                '&:hover': {
+                  bgcolor: 'primary.50'
+                }
+              }}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete Item">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteItem(params.row);
+              }}
+              sx={{
+                color: 'error.main',
+                '&:hover': {
+                  bgcolor: 'error.50'
+                }
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ];
   return (
     <Box sx={{ width: '100%' }}>
       <DataGrid
         rows={items}
-        columns={columns}
+        columns={columnsWithActions}
         loading={loading}
         pageSizeOptions={[10, 25, 50, 100]}
         initialState={{

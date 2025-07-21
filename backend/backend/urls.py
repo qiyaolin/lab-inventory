@@ -24,4 +24,6 @@ urlpatterns = [
     path('api/auth/', include('djoser.urls.jwt')),
     # Add inventory URLs
     path('api/inventory/', include('inventory.urls')),
+    # Add orders URLs
+    path('api/orders/', include('orders.urls')),
 ]

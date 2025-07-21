@@ -31,3 +31,10 @@ class ItemSerializer(serializers.ModelSerializer):
             'stock_warning_threshold', 'expiration_date', 'added_by', 
             'added_by_username', 'date_added', 'last_updated'
         ]
+
+class ItemAuditLogSerializer(serializers.ModelSerializer):
+    user_username = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = ItemAuditLog
+        fields = '__all__'
